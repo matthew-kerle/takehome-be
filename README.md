@@ -113,6 +113,16 @@ postgresql://postgres:postgres@localhost:5433/listings
 - Migrations are automatically applied when starting the container
 - You can manually run migrations with: `docker-compose exec web python listings/manage.py migrate`
 
+### Seed Data
+To import the sample listing data:
+```bash
+# Import seed data (preserves existing records)
+docker-compose exec web python listings/manage.py import_listing_data
+
+# Import seed data and reset existing records
+docker-compose exec web python listings/manage.py import_listing_data --reset
+```
+
 # Your Notes
 *TODO: Add your documentation here* 
 
