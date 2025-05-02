@@ -1,0 +1,326 @@
+{
+	"info": {
+		"_postman_id": "bungalow-listings-api",
+		"name": "Bungalow Listings API",
+		"description": "API for querying house listing information",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get All Listings",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/api/listings/",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8000",
+					"path": ["api", "listings", ""]
+				},
+				"description": "Get all listings with pagination (10 items per page by default)"
+			}
+		},
+		{
+			"name": "Get Listing by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/api/listings/{{listing_id}}/",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8000",
+					"path": ["api", "listings", "{{listing_id}}", ""],
+					"variable": [
+						{
+							"key": "listing_id",
+							"value": "1",
+							"description": "ID of the listing to retrieve"
+						}
+					]
+				},
+				"description": "Get a specific listing by its ID"
+			}
+		},
+		{
+			"name": "Filter Listings",
+			"item": [
+				{
+					"name": "Filter by Bedrooms and City",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/listings/?bedrooms=3&city=San Francisco",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "listings", ""],
+							"query": [
+								{
+									"key": "bedrooms",
+									"value": "3"
+								},
+								{
+									"key": "city",
+									"value": "San Francisco"
+								}
+							]
+						},
+						"description": "Get listings with 3 bedrooms in San Francisco"
+					}
+				},
+				{
+					"name": "Filter by Price Range",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/listings/?price_min=100000000&price_max=200000000",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "listings", ""],
+							"query": [
+								{
+									"key": "price_min",
+									"value": "100000000"
+								},
+								{
+									"key": "price_max",
+									"value": "200000000"
+								}
+							]
+						},
+						"description": "Get listings priced between $1M and $2M"
+					}
+				},
+				{
+					"name": "Filter by Multiple Criteria",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/listings/?bedrooms=3&city=San Francisco&price_min=200000000&price_max=300000000",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "listings", ""],
+							"query": [
+								{
+									"key": "bedrooms",
+									"value": "3"
+								},
+								{
+									"key": "city",
+									"value": "San Francisco"
+								},
+								{
+									"key": "price_min",
+									"value": "200000000"
+								},
+								{
+									"key": "price_max",
+									"value": "300000000"
+								}
+							]
+						},
+						"description": "Get listings in San Francisco with 3 bedrooms priced between $2M and $3M"
+					}
+				}
+			]
+		},
+		{
+			"name": "Search Listings",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/api/listings/?search=San Francisco",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8000",
+					"path": ["api", "listings", ""],
+					"query": [
+						{
+							"key": "search",
+							"value": "San Francisco"
+						}
+					]
+				},
+				"description": "Search listings by address, city, state, or zipcode"
+			}
+		},
+		{
+			"name": "Order Listings",
+			"item": [
+				{
+					"name": "Order by Price (Descending)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/listings/?ordering=-price",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "listings", ""],
+							"query": [
+								{
+									"key": "ordering",
+									"value": "-price"
+								}
+							]
+						},
+						"description": "Order listings by price (highest first)"
+					}
+				},
+				{
+					"name": "Order by Year Built",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/listings/?ordering=year_built",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "listings", ""],
+							"query": [
+								{
+									"key": "ordering",
+									"value": "year_built"
+								}
+							]
+						},
+						"description": "Order listings by year built (oldest first)"
+					}
+				}
+			]
+		},
+		{
+			"name": "Pagination",
+			"item": [
+				{
+					"name": "Get First Page",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/listings/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "listings", ""]
+						},
+						"description": "Get first page with default page size (10 items)"
+					}
+				},
+				{
+					"name": "Get Second Page",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/listings/?page=2",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "listings", ""],
+							"query": [
+								{
+									"key": "page",
+									"value": "2"
+								}
+							]
+						},
+						"description": "Get the second page of listings"
+					}
+				},
+				{
+					"name": "Custom Page Size",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/listings/?page=1&page_size=20",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "listings", ""],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Get first page with 20 items per page"
+					}
+				},
+				{
+					"name": "Maximum Page Size",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/listings/?page_size=100",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "listings", ""],
+							"query": [
+								{
+									"key": "page_size",
+									"value": "100"
+								}
+							]
+						},
+						"description": "Get all items in a single page (up to max page size of 100)"
+					}
+				},
+				{
+					"name": "Pagination with Filters",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/listings/?city=San Francisco&page=1&page_size=5",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "listings", ""],
+							"query": [
+								{
+									"key": "city",
+									"value": "San Francisco"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "5"
+								}
+							]
+						},
+						"description": "Get first page of San Francisco listings with 5 items per page"
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000/api",
+			"type": "string"
+		}
+	]
+} 

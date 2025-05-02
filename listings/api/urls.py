@@ -1,12 +1,10 @@
-from django.urls import include, path
-from rest_framework.routers import SimpleRouter
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import ListingViewSet
 
-from . import views
-
-# TODO: Create your routers and urls here
-router = SimpleRouter()
+router = DefaultRouter()
+router.register(r'listings', ListingViewSet, basename='listing')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]

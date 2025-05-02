@@ -123,9 +123,6 @@ docker-compose exec web python listings/manage.py import_listing_data
 docker-compose exec web python listings/manage.py import_listing_data --reset
 ```
 
-# Your Notes
-*TODO: Add your documentation here* 
-
 ## Time Spent
 *Give us a rough estimate of the time you spent working on this. If you spent time learning in order to do this project please feel free to let us know that too.*
 *This makes sure that we are evaluating your work fairly and in context. It also gives us the opportunity to learn and adjust our process if needed.*
@@ -133,7 +130,6 @@ docker-compose exec web python listings/manage.py import_listing_data --reset
 ## Assumptions
 *Did you find yourself needing to make assumptions to finish this?*
 *If so, what were they and how did they impact your design/code?*
-
 
 ## Next Steps
 *Provide us with some notes about what you would do next if you had more time.* 
@@ -144,7 +140,355 @@ docker-compose exec web python listings/manage.py import_listing_data --reset
 
 ### Anything else needed to make this production ready?
 
+## API Documentation
 
-## How to Use
-*Provide any end user documentation you think is necessary and useful here*
+### Base URL
+The API is available at `http://localhost:8000/api/`
+
+### Endpoints
+
+#### Listings
+- **GET /api/listings/** - List all listings
+- **GET /api/listings/{id}/** - Get a specific listing
+
+### Query Parameters
+
+#### Filtering
+You can filter listings using the following parameters:
+- `bedrooms` - Number of bedrooms
+- `bathrooms` - Number of bathrooms
+- `home_type` - Type of home
+- `city` - City name (spaces should be URL encoded as %20)
+- `state` - State code
+- `zipcode` - ZIP code
+- `year_built` - Year the home was built
+- `tax_year` - Year of tax assessment
+
+For price fields, you can filter using a range of values:
+- `price` - Current listing price (in cents)
+- `last_sold_price` - Last sold price (in cents)
+- `rent_price` - Rental price (in cents)
+- `rentzestimate_amount` - Zillow rent estimate (in cents)
+- `tax_value` - Tax assessed value (in cents)
+- `zestimate_amount` - Zillow home value estimate (in cents)
+
+To filter within a range, use the `min` and `max` parameters for any price field. For example:
+```
+# Get listings priced between $1M and $2M (100000000 and 200000000 cents)
+GET /api/listings/?price_min=100000000&price_max=200000000
+
+# Get listings with rent estimates between $2K and $3K (200000 and 300000 cents)
+GET /api/listings/?rentzestimate_amount_min=200000&rentzestimate_amount_max=300000
+```
+
+Example combining multiple filters:
+```
+# Get listings in San Francisco with 3 bedrooms priced between $1M and $2M
+GET /api/listings/?bedrooms=3&city=San%20Francisco&price_min=100000000&price_max=200000000
+```
+
+#### Searching
+You can search listings using the `search` parameter, which searches across:
+- `address` (spaces should be URL encoded as %20)
+- `city` (spaces should be URL encoded as %20)
+- `state`
+- `zipcode`
+
+Example:
+```
+# URL encoded version
+GET /api/listings/?search=San%20Francisco
+
+# Non-encoded version (for reference only, use the encoded version above)
+GET /api/listings/?search=San Francisco
+```
+
+#### Ordering
+You can order listings using the `ordering` parameter with the following fields:
+- `price` - Current listing price
+- `last_sold_price` - Last sold price
+- `rent_price` - Rental price
+- `rentzestimate_amount` - Zillow rent estimate
+- `tax_value` - Tax assessed value
+- `zestimate_amount` - Zillow home value estimate
+- `year_built` - Year built
+- `home_size` - Size of the home
+- `property_size` - Size of the property
+
+Add a `-` prefix for descending order.
+
+Example:
+```
+GET /api/listings/?ordering=-price
+```
+
+#### Pagination
+All list endpoints are paginated with the following features:
+
+- **Default Settings**
+  - 10 items per page
+  - Page numbers start at 1
+  - Maximum page size of 100 items
+
+- **Query Parameters**
+  - `page` - Page number to retrieve (default: 1)
+  - `page_size` - Number of items per page (default: 10, max: 100)
+
+- **Response Format**
+  ```json
+  {
+    "count": 448,           // Total number of items
+    "next": "http://localhost:8000/api/listings/?page=2",  // URL for next page
+    "previous": null,       // URL for previous page
+    "results": [            // List of items for current page
+      {
+        // Listing data
+      }
+    ]
+  }
+  ```
+
+Example API calls:
+```
+# Get first page with default page size (10 items)
+GET /api/listings/
+
+# Get second page with 20 items per page
+GET /api/listings/?page=2&page_size=20
+
+# Get last page (calculated from total count)
+GET /api/listings/?page=45
+
+# Get all items in a single page (up to max page size)
+GET /api/listings/?page_size=100
+```
+
+Note: The `next` and `previous` URLs in the response will automatically include any filters, search terms, or ordering parameters from the original request.
+
+### Example API Calls
+
+Using curl:
+```bash
+# Get all listings
+curl http://localhost:8000/api/listings/
+
+# Get listings with 3 bedrooms in San Francisco (URL encoded)
+curl "http://localhost:8000/api/listings/?bedrooms=3&city=San%20Francisco"
+
+# Get listings priced between $1M and $2M
+curl "http://localhost:8000/api/listings/?price_min=100000000&price_max=200000000"
+
+# Search for listings in San Francisco and order by price (URL encoded)
+curl "http://localhost:8000/api/listings/?search=San%20Francisco&ordering=-price"
+```
+
+Using Python requests:
+```python
+import requests
+
+# Get all listings
+response = requests.get('http://localhost:8000/api/listings/')
+listings = response.json()
+
+# Get listings with specific filters (requests handles URL encoding automatically)
+params = {
+    'bedrooms': 3,
+    'city': 'San Francisco',  # requests will handle the URL encoding
+    'ordering': '-price'
+}
+response = requests.get('http://localhost:8000/api/listings/', params=params)
+listings = response.json()
+
+# Get listings within a price range
+params = {
+    'price_min': 100000000,  # $1M
+    'price_max': 200000000,  # $2M
+    'city': 'San Francisco'
+}
+response = requests.get('http://localhost:8000/api/listings/', params=params)
+listings = response.json()
+```
+
+### Response Format
+The API returns JSON responses with the following structure:
+
+```json
+{
+    "count": 448,
+    "next": "http://localhost:8000/api/listings/?page=2",
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "zillow_id": "20023224",
+            "area_unit": "SqFt",
+            "bathrooms": 3.0,
+            "bedrooms": 3,
+            "home_size": 2000,
+            "home_type": "Single Family",
+            "last_sold_date": "2020-01-15",
+            "last_sold_price": "$2.4M",
+            "link": "https://www.zillow.com/homedetails/...",
+            "price": "$2.4M",
+            "property_size": 5000,
+            "rent_price": null,
+            "rentzestimate_amount": "$3,850",
+            "rentzestimate_last_updated": "2024-01-01",
+            "tax_value": "$95,860",
+            "tax_year": 2023,
+            "year_built": 1990,
+            "zestimate_amount": "$1,003,906",
+            "zestimate_last_updated": "2024-01-01",
+            "address": "123 Main St",
+            "city": "San Francisco",
+            "state": "CA",
+            "zipcode": "94105",
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z"
+        },
+        // ... more listings
+    ]
+}
+```
+
+### Testing the API
+You can test the API using any of the following methods:
+
+1. **Browser**
+   - Simply visit `http://localhost:8000/api/listings/` in your browser
+   - Add query parameters directly in the URL
+
+2. **curl**
+   ```bash
+   # Get all listings
+   curl http://localhost:8000/api/listings/
+
+   # Get listings with filters
+   curl "http://localhost:8000/api/listings/?bedrooms=3&city=San%20Francisco"
+   ```
+
+3. **Postman**
+   - Import the following collection:
+   ```json
+   {
+     "info": {
+       "name": "Bungalow Listings API",
+       "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+     },
+     "item": [
+       {
+         "name": "Get All Listings",
+         "request": {
+           "method": "GET",
+           "url": "http://localhost:8000/api/listings/"
+         }
+       },
+       {
+         "name": "Get Filtered Listings",
+         "request": {
+           "method": "GET",
+           "url": "http://localhost:8000/api/listings/",
+           "query": [
+             {"key": "bedrooms", "value": "3"},
+             {"key": "city", "value": "San Francisco"},  // Postman handles URL encoding automatically
+             {"key": "ordering", "value": "-price"}
+           ]
+         }
+       },
+       {
+         "name": "Get Listings in Price Range",
+         "request": {
+           "method": "GET",
+           "url": "http://localhost:8000/api/listings/",
+           "query": [
+             {"key": "price_min", "value": "100000000"},
+             {"key": "price_max", "value": "200000000"},
+             {"key": "city", "value": "San Francisco"}
+           ]
+         }
+       }
+     ]
+   }
+   ```
+
+4. **Python Script**
+   ```python
+   import requests
+   
+   # Get all listings
+   response = requests.get('http://localhost:8000/api/listings/')
+   print(response.json())
+   
+   # Get filtered listings
+   params = {
+       'bedrooms': 3,
+       'city': 'San Francisco',
+       'ordering': '-price'
+   }
+   response = requests.get('http://localhost:8000/api/listings/', params=params)
+   print(response.json())
+   ```
+
+5. **Django REST Framework Browsable API**
+   - Visit `http://localhost:8000/api/listings/` in your browser
+   - Use the built-in interface to test different filters and parameters
+   - View the raw API response in JSON format
+
+## Testing
+
+### Running Tests
+To run the test suite:
+
+```bash
+# Using Docker
+docker-compose exec web python listings/manage.py test api
+
+# Or locally (if you have Python and dependencies installed)
+python listings/manage.py test api
+```
+
+### Test Coverage
+The test suite includes comprehensive integration tests covering:
+
+1. **Basic Endpoint Tests**
+   - Get all listings
+   - Get single listing
+   - Get nonexistent listing (404 error)
+
+2. **Filtering Tests**
+   - By bedrooms
+   - By city
+   - By price range
+   - By multiple criteria
+   - By home type
+   - By state
+   - By zipcode
+   - By tax year
+   - By rent price range
+   - By zestimate range
+
+3. **Search Tests**
+   - Search by address, city, state, or zipcode
+
+4. **Ordering Tests**
+   - By price (descending)
+   - By year built
+
+5. **Pagination Tests**
+   - Basic pagination
+   - Invalid page number
+   - Invalid page size
+
+6. **Combined Tests**
+   - Filters with ordering
+   - Multiple filters together
+
+Each test case:
+- Sets up test data with two sample listings
+- Makes API requests with various parameters
+- Verifies response status codes
+- Checks response data structure and content
+- Tests both successful and error cases
+
+The test suite uses Django's test client and REST framework's test utilities to ensure reliable and maintainable tests.
 
