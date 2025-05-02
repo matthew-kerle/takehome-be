@@ -1,0 +1,6 @@
+{
+    "python.analysis.extraPaths": [
+        "./listings"
+    ],
+    "python.defaultInterpreterPath": "/usr/local/bin/python"
+} 
