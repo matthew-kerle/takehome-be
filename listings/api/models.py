@@ -1,9 +1,7 @@
 import hashlib
-import json
-from datetime import datetime
+from typing import Any, List, cast
 
 from django.db import models
-from django.utils import timezone
 
 
 class Listing(models.Model):
@@ -39,14 +37,15 @@ class Listing(models.Model):
     # Hash field for change detection
     data_hash = models.CharField(max_length=64, null=True)
 
-    def __str__(self):
-        return (
-            f"{self.address} - ${self.price/100:,.2f}" if self.price else self.address
-        )
+    def __str__(self) -> str:
+        address = cast(str, self.address)
+        if self.price is not None:
+            return f"{address} - ${self.price/100:,.2f}"
+        return address
 
-    def calculate_data_hash(self):
+    def calculate_data_hash(self) -> str:
         """Calculate a hash of the relevant fields to detect changes."""
-        fields_to_hash = [
+        fields_to_hash: List[str] = [
             str(self.area_unit),
             str(self.bathrooms),
             str(self.bedrooms),
@@ -73,7 +72,7 @@ class Listing(models.Model):
         ]
         return hashlib.sha256("".join(fields_to_hash).encode()).hexdigest()
 
-    def save(self, *args, **kwargs):
+    def save(self, *args: Any, **kwargs: Any) -> None:
         self.data_hash = self.calculate_data_hash()
         super().save(*args, **kwargs)
 

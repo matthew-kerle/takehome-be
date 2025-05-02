@@ -1,15 +1,7 @@
 from django.db.models import Q
-from django.forms import fields as django_fields
-from django.shortcuts import render
 from django_filters import filters as django_filters
-from django_filters.rest_framework import (
-    DjangoFilterBackend,
-    FilterSet,
-    NumberFilter,
-    RangeFilter,
-)
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from rest_framework import filters, viewsets
-from rest_framework.pagination import PageNumberPagination
 
 from .models import Listing
 from .pagination import CustomPageNumberPagination
@@ -20,21 +12,33 @@ from .utils import convert_price_param_to_cents
 class RangeFilterMixin:
     """Mixin to add min/max range filtering for numeric fields."""
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not hasattr(self, "filters"):
+            self.filters = {}
+
     def create_range_filter(self, field_name, filter_name=None):
         """Create min/max filters for a numeric field."""
         if filter_name is None:
             filter_name = field_name
 
         self.filters[f"{filter_name}_min"] = django_filters.NumberFilter(
-            field_name=field_name, lookup_expr="gte"
+            field_name=field_name,
+            lookup_expr="gte",
         )
         self.filters[f"{filter_name}_max"] = django_filters.NumberFilter(
-            field_name=field_name, lookup_expr="lte"
+            field_name=field_name,
+            lookup_expr="lte",
         )
 
 
 class PriceRangeFilterMixin:
     """Mixin to add price range filtering with currency conversion."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not hasattr(self, "filters"):
+            self.filters = {}
 
     def create_price_range_filter(self, field_name, filter_name=None):
         """Create min/max filters for a price field with currency conversion."""
@@ -42,14 +46,16 @@ class PriceRangeFilterMixin:
             filter_name = field_name
 
         self.filters[f"{filter_name}_min"] = django_filters.CharFilter(
-            method=f"filter_{field_name}_min"
+            method=f"filter_{field_name}_min",
         )
         self.filters[f"{filter_name}_max"] = django_filters.CharFilter(
-            method=f"filter_{field_name}_max"
+            method=f"filter_{field_name}_max",
         )
 
     def filter_price_range(self, queryset, field, min_value=None, max_value=None):
-        """Filter queryset by price range using a single Q object to combine conditions."""
+        """Filter queryset by price range.
+        Uses a single Q object to combine min and max conditions.
+        """
         if not min_value and not max_value:
             return queryset
 
@@ -114,10 +120,12 @@ class ListingFilter(FilterSet, RangeFilterMixin, PriceRangeFilterMixin):
         return self.filter_price_range(queryset, "rent_price", max_value=value)
 
     def filter_rentzestimate_amount_min(self, queryset, name, value):
-        return self.filter_price_range(queryset, "rentzestimate_amount", min_value=value)
+        field = "rentzestimate_amount"
+        return self.filter_price_range(queryset, field, min_value=value)
 
     def filter_rentzestimate_amount_max(self, queryset, name, value):
-        return self.filter_price_range(queryset, "rentzestimate_amount", max_value=value)
+        field = "rentzestimate_amount"
+        return self.filter_price_range(queryset, field, max_value=value)
 
     def filter_tax_value_min(self, queryset, name, value):
         return self.filter_price_range(queryset, "tax_value", min_value=value)

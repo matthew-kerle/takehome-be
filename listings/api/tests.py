@@ -1,12 +1,10 @@
-import json
-
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
 from .models import Listing
-from .utils import convert_price_param_to_cents, convert_price_to_cents
+from .utils import convert_price_to_cents
 
 
 class ListingAPITests(TestCase):
@@ -676,3 +674,215 @@ class ListingAPITests(TestCase):
             property_size__lte=10000,
         ).count()
         self.assertEqual(response.data["count"], filtered_count)
+
+    def test_filter_price_range_with_min_and_max(self):
+        """Test filtering by both min and max price."""
+        response = self.client.get(f"{self.url}?price_min=1.5M&price_max=2M")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 10)
+        for listing in data["results"]:
+            price = listing["price"]
+            self.assertGreaterEqual(price, 150000000)
+            self.assertLessEqual(price, 200000000)
+
+    def test_filter_price_range_with_min_only(self):
+        """Test filtering by min price only."""
+        response = self.client.get(f"{self.url}?price_min=1.5M")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 357)
+        for listing in data["results"]:
+            self.assertGreaterEqual(listing["price"], 150000000)
+
+    def test_filter_price_range_with_max_only(self):
+        """Test filtering by max price only."""
+        response = self.client.get(f"{self.url}?price_max=2M")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 10)
+        for listing in data["results"]:
+            self.assertLessEqual(listing["price"], 200000000)
+
+    def test_filter_price_range_with_invalid_min(self):
+        """Test filtering with invalid min price."""
+        response = self.client.get(f"{self.url}?price_min=invalid")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 448)
+
+    def test_filter_price_range_with_invalid_max(self):
+        """Test filtering with invalid max price."""
+        response = self.client.get(f"{self.url}?price_max=invalid")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 448)
+
+    def test_filter_price_range_with_min_greater_than_max(self):
+        """Test filtering with min price greater than max price."""
+        response = self.client.get(f"{self.url}?price_min=2M&price_max=1.5M")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 0)
+
+    def test_filter_price_range_with_same_min_and_max(self):
+        """Test filtering with same min and max price."""
+        response = self.client.get(f"{self.url}?price_min=1.5M&price_max=1.5M")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 10)
+        for listing in data["results"]:
+            self.assertEqual(listing["price"], 150000000)
+
+    def test_filter_price_range_with_zero_min(self):
+        """Test filtering with zero min price."""
+        response = self.client.get(f"{self.url}?price_min=0")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 448)
+
+    def test_filter_price_range_with_zero_max(self):
+        """Test filtering with zero max price."""
+        response = self.client.get(f"{self.url}?price_max=0")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 0)
+
+    def test_filter_price_range_with_negative_min(self):
+        """Test filtering with negative min price."""
+        response = self.client.get(f"{self.url}?price_min=-1")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 448)
+
+    def test_filter_price_range_with_negative_max(self):
+        """Test filtering with negative max price."""
+        response = self.client.get(f"{self.url}?price_max=-1")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 0)
+
+    def test_filter_price_range_with_empty_min(self):
+        """Test filtering with empty min price."""
+        response = self.client.get(f"{self.url}?price_min=")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 448)
+
+    def test_filter_price_range_with_empty_max(self):
+        """Test filtering with empty max price."""
+        response = self.client.get(f"{self.url}?price_max=")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 448)
+
+    def test_filter_price_range_with_none_min(self):
+        """Test filtering with None min price."""
+        response = self.client.get(f"{self.url}?price_min=None")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 448)
+
+    def test_filter_price_range_with_none_max(self):
+        """Test filtering with None max price."""
+        response = self.client.get(f"{self.url}?price_max=None")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 448)
+
+    def test_filter_price_range_with_min_and_max_as_strings(self):
+        """Test filtering with min and max prices as strings."""
+        response = self.client.get(f"{self.url}?price_min=1.5M&price_max=2M")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 10)
+        for listing in data["results"]:
+            price = listing["price"]
+            self.assertGreaterEqual(price, 150000000)
+            self.assertLessEqual(price, 200000000)
+
+    def test_filter_price_range_with_min_and_max_as_floats(self):
+        """Test filtering with min and max prices as floats."""
+        response = self.client.get(f"{self.url}?price_min=1.5&price_max=2.0")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 10)
+        for listing in data["results"]:
+            price = listing["price"]
+            self.assertGreaterEqual(price, 150000000)
+            self.assertLessEqual(price, 200000000)
+
+    def test_filter_price_range_with_min_and_max_as_integers(self):
+        """Test filtering with min and max prices as integers."""
+        response = self.client.get(f"{self.url}?price_min=1500000&price_max=2000000")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 10)
+        for listing in data["results"]:
+            price = listing["price"]
+            self.assertGreaterEqual(price, 150000000)
+            self.assertLessEqual(price, 200000000)
+
+    def test_filter_price_range_with_min_and_max_as_k(self):
+        """Test filtering with min and max prices as k."""
+        response = self.client.get(f"{self.url}?price_min=1500K&price_max=2000K")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 10)
+        for listing in data["results"]:
+            price = listing["price"]
+            self.assertGreaterEqual(price, 150000000)
+            self.assertLessEqual(price, 200000000)
+
+    def test_filter_price_range_with_min_and_max_as_m(self):
+        """Test filtering with min and max prices as m."""
+        response = self.client.get(f"{self.url}?price_min=1.5M&price_max=2M")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 10)
+        for listing in data["results"]:
+            price = listing["price"]
+            self.assertGreaterEqual(price, 150000000)
+            self.assertLessEqual(price, 200000000)
+
+    def test_filter_price_range_with_min_and_max_as_b(self):
+        """Test filtering with min and max prices as b."""
+        response = self.client.get(f"{self.url}?price_min=1.5B&price_max=2B")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 0)
+
+    def test_filter_price_range_with_min_and_max_as_t(self):
+        """Test filtering with min and max prices as t."""
+        response = self.client.get(f"{self.url}?price_min=1.5T&price_max=2T")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 0)
+
+    def test_filter_price_range_with_min_and_max_as_p(self):
+        """Test filtering with min and max prices as p."""
+        response = self.client.get(f"{self.url}?price_min=1.5P&price_max=2P")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 0)
+
+    def test_filter_price_range_with_min_and_max_as_e(self):
+        """Test filtering with min and max prices as e."""
+        response = self.client.get(f"{self.url}?price_min=1.5E&price_max=2E")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 0)
+
+    def test_filter_price_range_with_min_and_max_as_z(self):
+        """Test filtering with min and max prices as z."""
+        response = self.client.get(f"{self.url}?price_min=1.5Z&price_max=2Z")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 0)
+
+    def test_filter_price_range_with_min_and_max_as_y(self):
+        """Test filtering with min and max prices as y."""
+        response = self.client.get(f"{self.url}?price_min=1.5Y&price_max=2Y")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 0)

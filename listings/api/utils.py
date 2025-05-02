@@ -4,7 +4,8 @@ def convert_price_to_cents(price_str):
     Also handles numeric inputs that are already in cents.
 
     Args:
-        price_str (str or int or float): Price in format like '$739K' or '$2.8M', or numeric value in cents
+        price_str (str or int or float): Price in format like '$739K' or '$2.8M',
+            or numeric value in cents
 
     Returns:
         int: Price in cents, or None if conversion fails
@@ -96,5 +97,15 @@ def convert_price_param_to_cents(param):
             return parse_price_to_cents(param)
         # If it's a number (float/int), convert to cents
         return int(float(param) * 100)
+    except (ValueError, TypeError):
+        return None
+
+
+def safe_int(value):
+    """Safely convert a value to int, returning None if conversion fails."""
+    if value is None or (isinstance(value, str) and value.strip() == ""):
+        return None
+    try:
+        return int(float(value))
     except (ValueError, TypeError):
         return None

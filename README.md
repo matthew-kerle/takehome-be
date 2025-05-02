@@ -24,37 +24,6 @@ You can choose to improve and refine this very basic API design, and we encourag
 This will give us an opportunity to see how you approach API design.
 If you are running out of time, you can outline how you would have done things differently given more time.
 
-
-## How Will This Be Evaluated
-We will use this project as our basis for our evaluation of your coding skill level as it relates to our team.
-To do this, we will review your code with an eye for the following:
-
-- Design Choices - choice of functionality, readability, maintainability, extendability, appropriate use of language/framework features
-- Does it work as outlined
-- Testing - have you considered how you'd test your code?
-- Documentation - have you provided context around decisions and assumptions that you have made?
-- Polish - have you produced something that would be ready to go into a production system?
-  if not, have you clearly stated what would be needed to get from where it is to that level of polish?
-
-## Time Expectations
-We know you are busy and likely have other commitments in your life, so we don't want to take too much of your time.
-We don't expect you to spend more than 2 hours working on this project. That being said, if you choose to put more or
-less time into it for whatever reason, that is your choice. Feel free to indicate in your notes below if you worked on
-this for a different amount of time and we will keep that in mind while evaluating the project. You can also provide us
-with additional context if you would like to. Additionally, we have left a spot below for you to note. If you have ideas 
-for pieces that you would have done differently or additional things you would have implemented if you had more time, 
-you can indicate those in your notes below as well, and we will use those as part of the evaluation. For example, if you 
-would have tested more, you can describe the tests that you would have written, and just provide 1 or 2 actual implemented
-tests.
-
-## Public Forks
-We encourage you to try this project without looking at the solutions others may have posted. This will give the most
-honest representation of your abilities and skills. However, we also recognize that day-to-day programming often involves 
-looking at solutions others have provided and iterating on them. Being able to pick out the best parts and truly 
-understand them well enough to make good choices about what to copy and what to pass on by is a skill in and of itself. 
-As such, if you do end up referencing someone else's work and building upon it, we ask that you note that as a comment. 
-Provide a link to the source so we can see the original work and any modifications that you chose to make. 
-
 ## Setup Instructions
 
 ### Option 1: Local Setup
@@ -526,5 +495,64 @@ Each test case:
 - Tests both successful and error cases
 
 The test suite uses Django's test client and REST framework's test utilities to ensure reliable and maintainable tests.
+
+### Available Scripts
+
+The project includes several utility scripts located in the `scripts/` directory. These can be run within the Docker container using the following pattern:
+```bash
+docker-compose exec web ./scripts/<script_name>
+```
+
+#### Core Scripts
+- **check**: Runs all code quality checks (linting, formatting, and type checking)
+  ```bash
+  docker-compose exec web ./scripts/check
+  ```
+
+- **lint**: Runs flake8 linting to check code style and find potential errors
+  ```bash
+  docker-compose exec web ./scripts/lint
+  ```
+
+- **type-check**: Runs mypy type checking to verify type annotations
+  ```bash
+  docker-compose exec web ./scripts/type-check
+  ```
+
+- **format**: Automatically formats code using black and isort
+  ```bash
+  docker-compose exec web ./scripts/format
+  ```
+
+#### Script Details
+
+1. **check**
+   - Combines lint and type-check scripts
+   - Exits with non-zero status if any checks fail
+   - Use this before committing code to ensure all quality checks pass
+
+2. **lint**
+   - Runs flake8 with project-specific configuration
+   - Checks for PEP 8 compliance
+   - Verifies maximum line length (88 characters)
+   - Ensures proper import ordering
+
+3. **type-check**
+   - Runs mypy static type checker
+   - Verifies type annotations are correct
+   - Checks for type-related errors
+   - Ensures type safety across the codebase
+
+4. **format**
+   - Runs black code formatter
+   - Runs isort import sorter
+   - Automatically fixes code style issues
+   - Makes code consistent across the project
+
+#### Best Practices
+1. Run `./scripts/format` before committing changes to automatically fix style issues
+2. Run `./scripts/check` to verify all checks pass before submitting code
+3. If type checking fails, ensure all functions have proper type annotations
+4. Use `./scripts/lint` to identify specific style issues that need fixing
 
 
