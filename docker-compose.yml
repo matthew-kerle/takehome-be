@@ -1,29 +1,46 @@
 version: '3.8'
 
 services:
-  web:
-    build: .
-    command: python listings/manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/app
-    ports:
-      - "8000:8000"
-    environment:
-      - DEBUG=1
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/listings
-    depends_on:
-      - db
-
   db:
     image: postgres:15
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=listings
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
     ports:
       - "5433:5432"
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    volumes:
+      - .:/app
+      - .git:/app/.git
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/listings
+      - PYTHONPATH=/app
+      - DJANGO_SETTINGS_MODULE=listings.settings
+    tty: true
+    stdin_open: true
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
 
 volumes:
   postgres_data: 

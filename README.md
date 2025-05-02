@@ -1,5 +1,8 @@
 # Bungalow Take Home Project for Backend Developer Role
 
+## To Do
+- [ ] Add a frontend just to interface with the API's for a better experience
+
 ## About This Project
 This is a Django based assignment. We have created a base project for you to work from. 
 You are free to vary from our original base if you would like to. We provide it with the intention of providing 
@@ -92,6 +95,39 @@ The project includes Docker configuration for easy setup and consistent developm
 - View logs: `docker-compose logs -f`
 - Execute commands in container: `docker-compose exec web <command>`
 - Rebuild containers: `docker-compose up -d --build`
+
+### Development Tools and Linting
+
+The project includes several development tools to ensure code quality and consistency:
+
+#### Linting Tools
+- **flake8**: Python code style checker
+- **black**: Python code formatter
+- **isort**: Python import sorter
+- **mypy**: Static type checker for Python
+
+#### Available Commands
+You can run linting commands through Docker:
+
+```bash
+# Run all linting checks
+docker-compose exec web lint
+
+# Run type checking
+docker-compose exec web type-check
+
+# Format code
+docker-compose exec web format
+
+# Run all checks (linting and type checking)
+docker-compose exec web check
+```
+
+The linters are configured to enforce:
+- PEP 8 style guidelines
+- Consistent code formatting
+- Proper import ordering
+- Type annotations where appropriate
 
 ### Database Setup
 The project uses PostgreSQL as the database. You can connect to it using:
@@ -428,7 +464,6 @@ You can test the API using any of the following methods:
    response = requests.get('http://localhost:8000/api/listings/', params=params)
    print(response.json())
    ```
-
 5. **Django REST Framework Browsable API**
    - Visit `http://localhost:8000/api/listings/` in your browser
    - Use the built-in interface to test different filters and parameters
@@ -491,4 +526,5 @@ Each test case:
 - Tests both successful and error cases
 
 The test suite uses Django's test client and REST framework's test utilities to ensure reliable and maintainable tests.
+
 

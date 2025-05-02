@@ -1,8 +1,10 @@
-from django.db import models
-from django.utils import timezone
 import hashlib
 import json
 from datetime import datetime
+
+from django.db import models
+from django.utils import timezone
+
 
 class Listing(models.Model):
     area_unit = models.CharField(max_length=10)
@@ -28,17 +30,19 @@ class Listing(models.Model):
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=2)
     zipcode = models.CharField(max_length=10)
-    
+
     # New timestamp fields
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     last_imported_at = models.DateTimeField(null=True)
-    
+
     # Hash field for change detection
     data_hash = models.CharField(max_length=64, null=True)
 
     def __str__(self):
-        return f"{self.address} - ${self.price/100:,.2f}" if self.price else self.address
+        return (
+            f"{self.address} - ${self.price/100:,.2f}" if self.price else self.address
+        )
 
     def calculate_data_hash(self):
         """Calculate a hash of the relevant fields to detect changes."""
@@ -67,11 +71,11 @@ class Listing(models.Model):
             str(self.state),
             str(self.zipcode),
         ]
-        return hashlib.sha256(''.join(fields_to_hash).encode()).hexdigest()
+        return hashlib.sha256("".join(fields_to_hash).encode()).hexdigest()
 
     def save(self, *args, **kwargs):
         self.data_hash = self.calculate_data_hash()
         super().save(*args, **kwargs)
 
     class Meta:
-        ordering = ['-zestimate_amount']
+        ordering = ["-zestimate_amount"]

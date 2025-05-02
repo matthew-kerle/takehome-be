@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "bungalow-listings-api",
 		"name": "Bungalow Listings API",
-		"description": "API for querying house listing information",
+		"description": "API for querying house listing information\n\nFeatures:\n- Pagination (10 items per page by default)\n- Flexible price filtering with various formats (plain numbers, K/M suffix, decimal points)\n- Case-insensitive address filtering\n- Numeric range filtering for various fields\n- Sorting and ordering\n\nFor detailed documentation, see the API endpoint descriptions.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -47,12 +47,138 @@
 			"name": "Filter Listings",
 			"item": [
 				{
+					"name": "Address Filtering",
+					"item": [
+						{
+							"name": "Filter by Address",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8000/api/listings/?address=main",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8000",
+									"path": ["api", "listings", ""],
+									"query": [
+										{
+											"key": "address",
+											"value": "main",
+											"description": "Case-insensitive partial match for address"
+										}
+									]
+								},
+								"description": "Filter listings by partial address match (case-insensitive)"
+							}
+						},
+						{
+							"name": "Filter by City",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8000/api/listings/?city=sher",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8000",
+									"path": ["api", "listings", ""],
+									"query": [
+										{
+											"key": "city",
+											"value": "sher",
+											"description": "Case-insensitive partial match for city"
+										}
+									]
+								},
+								"description": "Filter listings by partial city name match (case-insensitive)"
+							}
+						},
+						{
+							"name": "Filter by State",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8000/api/listings/?state=CA",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8000",
+									"path": ["api", "listings", ""],
+									"query": [
+										{
+											"key": "state",
+											"value": "CA",
+											"description": "Case-insensitive exact match for state"
+										}
+									]
+								},
+								"description": "Filter listings by state (case-insensitive, exact match)"
+							}
+						},
+						{
+							"name": "Filter by Zipcode",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8000/api/listings/?zipcode=91423",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8000",
+									"path": ["api", "listings", ""],
+									"query": [
+										{
+											"key": "zipcode",
+											"value": "91423",
+											"description": "Case-insensitive partial match for zipcode"
+										}
+									]
+								},
+								"description": "Filter listings by partial zipcode match (case-insensitive)"
+							}
+						},
+						{
+							"name": "Combined Address Filters",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8000/api/listings/?address=main&city=sher&state=CA&zipcode=91423",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8000",
+									"path": ["api", "listings", ""],
+									"query": [
+										{
+											"key": "address",
+											"value": "main"
+										},
+										{
+											"key": "city",
+											"value": "sher"
+										},
+										{
+											"key": "state",
+											"value": "CA"
+										},
+										{
+											"key": "zipcode",
+											"value": "91423"
+										}
+									]
+								},
+								"description": "Filter listings using multiple address-related criteria"
+							}
+						}
+					]
+				},
+				{
 					"name": "Filter by Bedrooms and City",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8000/api/listings/?bedrooms=3&city=San Francisco",
+							"raw": "http://localhost:8000/api/listings/?bedrooms=3&city=Tarzana",
 							"protocol": "http",
 							"host": ["localhost"],
 							"port": "8000",
@@ -64,20 +190,169 @@
 								},
 								{
 									"key": "city",
-									"value": "San Francisco"
+									"value": "Tarzana"
 								}
 							]
 						},
-						"description": "Get listings with 3 bedrooms in San Francisco"
+						"description": "Get listings with 3 bedrooms in Tarzana"
 					}
 				},
 				{
-					"name": "Filter by Price Range",
+					"name": "Filter by Home Size Range",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8000/api/listings/?price_min=100000000&price_max=200000000",
+							"raw": "http://localhost:8000/api/listings/?home_size_min=2000&home_size_max=3000",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "listings", ""],
+							"query": [
+								{
+									"key": "home_size_min",
+									"value": "2000"
+								},
+								{
+									"key": "home_size_max",
+									"value": "3000"
+								}
+							]
+						},
+						"description": "Filter listings with home size between 2,000 and 3,000 square feet"
+					}
+				},
+				{
+					"name": "Filter by Bedrooms Range",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/listings/?bedrooms_min=3&bedrooms_max=4",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "listings", ""],
+							"query": [
+								{
+									"key": "bedrooms_min",
+									"value": "3"
+								},
+								{
+									"key": "bedrooms_max",
+									"value": "4"
+								}
+							]
+						},
+						"description": "Filter listings with 3-4 bedrooms"
+					}
+				},
+				{
+					"name": "Filter by Bathrooms Range",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/listings/?bathrooms_min=2&bathrooms_max=3",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "listings", ""],
+							"query": [
+								{
+									"key": "bathrooms_min",
+									"value": "2"
+								},
+								{
+									"key": "bathrooms_max",
+									"value": "3"
+								}
+							]
+						},
+						"description": "Filter listings with 2-3 bathrooms"
+					}
+				},
+				{
+					"name": "Filter by Property Size Range",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/listings/?property_size_min=5000&property_size_max=10000",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "listings", ""],
+							"query": [
+								{
+									"key": "property_size_min",
+									"value": "5000"
+								},
+								{
+									"key": "property_size_max",
+									"value": "10000"
+								}
+							]
+						},
+						"description": "Filter listings with property size between 5,000 and 10,000 square feet"
+					}
+				},
+				{
+					"name": "Filter by Multiple Numeric Ranges",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/listings/?home_size_min=2000&home_size_max=3000&bedrooms_min=3&bedrooms_max=4&bathrooms_min=2&bathrooms_max=3&property_size_min=5000&property_size_max=10000",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "listings", ""],
+							"query": [
+								{
+									"key": "home_size_min",
+									"value": "2000"
+								},
+								{
+									"key": "home_size_max",
+									"value": "3000"
+								},
+								{
+									"key": "bedrooms_min",
+									"value": "3"
+								},
+								{
+									"key": "bedrooms_max",
+									"value": "4"
+								},
+								{
+									"key": "bathrooms_min",
+									"value": "2"
+								},
+								{
+									"key": "bathrooms_max",
+									"value": "3"
+								},
+								{
+									"key": "property_size_min",
+									"value": "5000"
+								},
+								{
+									"key": "property_size_max",
+									"value": "10000"
+								}
+							]
+						},
+						"description": "Filter listings with multiple numeric range criteria"
+					}
+				},
+				{
+					"name": "Filter by Price Range (Comma Format)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/listings/?price_min=700,000&price_max=1,200,000",
 							"protocol": "http",
 							"host": ["localhost"],
 							"port": "8000",
@@ -85,15 +360,90 @@
 							"query": [
 								{
 									"key": "price_min",
-									"value": "100000000"
+									"value": "700,000"
 								},
 								{
 									"key": "price_max",
-									"value": "200000000"
+									"value": "1,200,000"
 								}
 							]
 						},
-						"description": "Get listings priced between $1M and $2M"
+						"description": "Filter listings between $700,000 and $1,200,000 using comma-separated numbers"
+					}
+				},
+				{
+					"name": "Filter by Price Range (M suffix)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/listings/?price_min=1.5M&price_max=3M",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "listings", ""],
+							"query": [
+								{
+									"key": "price_min",
+									"value": "1.5M"
+								},
+								{
+									"key": "price_max",
+									"value": "3M"
+								}
+							]
+						},
+						"description": "Filter listings between $1.5M and $3M"
+					}
+				},
+				{
+					"name": "Filter by Price Range (K suffix)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/listings/?price_min=750K&price_max=1.2M",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "listings", ""],
+							"query": [
+								{
+									"key": "price_min",
+									"value": "750K"
+								},
+								{
+									"key": "price_max",
+									"value": "1.2M"
+								}
+							]
+						},
+						"description": "Filter listings between $750K and $1.2M"
+					}
+				},
+				{
+					"name": "Filter by Rent Price (K suffix)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/listings/?rent_price_min=2.5K&rent_price_max=4K",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "listings", ""],
+							"query": [
+								{
+									"key": "rent_price_min",
+									"value": "2.5K"
+								},
+								{
+									"key": "rent_price_max",
+									"value": "4K"
+								}
+							]
+						},
+						"description": "Filter listings with rent between $2.5K and $4K per month"
 					}
 				},
 				{
@@ -102,7 +452,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8000/api/listings/?bedrooms=3&city=San Francisco&price_min=200000000&price_max=300000000",
+							"raw": "http://localhost:8000/api/listings/?bedrooms=3&city=Tarzana&price_min=2M&price_max=5M&home_size_min=2000&bathrooms_min=2",
 							"protocol": "http",
 							"host": ["localhost"],
 							"port": "8000",
@@ -114,19 +464,27 @@
 								},
 								{
 									"key": "city",
-									"value": "San Francisco"
+									"value": "Tarzana"
 								},
 								{
 									"key": "price_min",
-									"value": "200000000"
+									"value": "2M"
 								},
 								{
 									"key": "price_max",
-									"value": "300000000"
+									"value": "5M"
+								},
+								{
+									"key": "home_size_min",
+									"value": "2000"
+								},
+								{
+									"key": "bathrooms_min",
+									"value": "2"
 								}
 							]
 						},
-						"description": "Get listings in San Francisco with 3 bedrooms priced between $2M and $3M"
+						"description": "Filter 3-bedroom listings in Tarzana between $2M and $5M with at least 2,000 sq ft and 2 bathrooms"
 					}
 				}
 			]
@@ -137,7 +495,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/api/listings/?search=San Francisco",
+					"raw": "http://localhost:8000/api/listings/?search=Tarzana",
 					"protocol": "http",
 					"host": ["localhost"],
 					"port": "8000",
@@ -145,7 +503,7 @@
 					"query": [
 						{
 							"key": "search",
-							"value": "San Francisco"
+							"value": "Tarzana"
 						}
 					]
 				},
@@ -290,7 +648,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8000/api/listings/?city=San Francisco&page=1&page_size=5",
+							"raw": "http://localhost:8000/api/listings/?city=Tarzana&page=1&page_size=5",
 							"protocol": "http",
 							"host": ["localhost"],
 							"port": "8000",
@@ -298,7 +656,7 @@
 							"query": [
 								{
 									"key": "city",
-									"value": "San Francisco"
+									"value": "Tarzana"
 								},
 								{
 									"key": "page",
@@ -310,7 +668,7 @@
 								}
 							]
 						},
-						"description": "Get first page of San Francisco listings with 5 items per page"
+						"description": "Get first page of Tarzana listings with 5 items per page"
 					}
 				}
 			]
