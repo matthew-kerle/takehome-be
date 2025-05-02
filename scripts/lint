@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+flake8 listings
+black --check listings
+isort --check-only listings 
