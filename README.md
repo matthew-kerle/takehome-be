@@ -136,9 +136,18 @@ docker-compose exec web python listings/manage.py import_listing_data --reset
 *Did you find yourself needing to make assumptions to finish this?*
 *If so, what were they and how did they impact your design/code?*
 
-## Next Steps
-*Provide us with some notes about what you would do next if you had more time.* 
-*Are there additional features that you would want to add? Specific improvements to your code you would make?*
+### Improvements
+
+#### Frontend
+- Add environment variables so it's actually production ready.
+- Handle pre-fetching, loading states, caching, and error states better
+- Spend more time on responsiveness
+- Add real frontend tests
+- Break things into more atomic components
+- Add Prettier + ESLint into the frontend
+- Wire up listing filtering
+- Wire up "favorites"
+
 ### Features
 
 ### Testing

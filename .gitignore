@@ -130,3 +130,17 @@ dmypy.json
 
 # PyCharm settings
 .idea
+
+# Frontend (React, Yarn, NPM, Vite)
+/frontend/node_modules/
+/frontend/.pnp/
+/frontend/.pnp.js
+/frontend/.yarn/
+/frontend/.yarnrc.yml
+/frontend/yarn-error.log
+/frontend/yarn.lock
+/frontend/package-lock.json
+/frontend/npm-debug.log*
+/frontend/dist/
+/frontend/.vite/
+/frontend/.env*
