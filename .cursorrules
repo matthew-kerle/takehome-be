@@ -1,0 +1,138 @@
+# Django Project Rules
+# These rules guide AI code generation and behavior in this project
+
+python_rules:
+  always:
+    - Type hints for function parameters and return values
+    - Docstrings for classes and functions (Google style)
+    - f-strings over .format() or % formatting
+    - List/dict/set comprehensions when they improve readability
+    - Context managers (with statements) for file and resource handling
+    - Pathlib over os.path for file operations
+  avoid:
+    - Global variables
+    - Mutable default arguments
+    - Bare except clauses
+    - from module import *
+    - exec() or eval()
+    - Type comments (use annotations instead)
+
+django_rules:
+  required:
+    - Model field constraints in model definitions
+    - Django's built-in validators
+    - get_object_or_404 for view queries
+    - Model Managers for complex queries
+    - Django's transaction management
+    - Lazy translations for user-facing strings
+    - Settings from django.conf
+    - Django's testing tools
+  prohibited:
+    - Raw SQL queries (use ORM)
+    - Direct model saves in views (use forms/serializers)
+    - Database queries in templates
+    - Hardcoded URLs (use reverse/resolve)
+    - Direct response in middleware (use exceptions)
+
+drf_rules:
+  required:
+    - ViewSets for consistent CRUD operations
+    - Serializers for data validation
+    - Pagination for list views
+    - Proper permission classes
+    - Filter backends for query parameters
+    - Response objects from rest_framework
+    - Status codes from rest_framework
+  prohibited:
+    - Raw JSON responses
+    - Direct model serialization
+    - Hardcoded status codes
+
+testing_rules:
+  required:
+    - pytest fixtures
+    - Factory Boy for model instances
+    - Proper test isolation
+    - Meaningful test names
+    - setUp and tearDown methods
+    - Coverage reports
+    - Mock for external services
+  prohibited:
+    - Production data in tests
+    - Sleep in tests
+    - Hard-coded test data
+
+code_style:
+  follow:
+    - Black formatting (88 chars)
+    - isort for imports
+    - flake8 for linting
+    - mypy for type checking
+    - Google style docstrings
+    - Consistent method ordering in classes
+    - Clear variable names
+    - Single responsibility principle
+
+error_handling:
+  required:
+    - Specific exception classes
+    - Custom exceptions when needed
+    - try/except with specific exceptions
+    - Proper error messages
+    - Logging instead of print
+    - Django's logging configuration
+  prohibited:
+    - Silent failures
+    - Catching Exception without re-raising
+    - print() for debugging
+
+security_rules:
+  required:
+    - CSRF protection
+    - XSS prevention
+    - Input validation
+    - Proper authentication
+    - Environment variables for secrets
+    - Secure password handling
+    - Request validation
+  prohibited:
+    - Hardcoded credentials
+    - DEBUG=True in production
+    - Raw data in templates
+    - Direct user input in queries
+
+performance_rules:
+  required:
+    - select_related/prefetch_related
+    - Cached properties when appropriate
+    - Bulk operations for multiple objects
+    - Indexed fields for filtering
+    - Efficient querysets
+    - Database constraints
+  prohibited:
+    - N+1 queries
+    - Large data processing in views
+    - Inefficient list operations
+    - Memory-intensive operations
+
+documentation:
+  required:
+    - API endpoint documentation
+    - Function/method docstrings
+    - Complex logic explanation
+    - Configuration requirements
+    - Environment setup instructions
+    - Testing instructions
+
+deployment:
+  required:
+    - Environment variables
+    - Docker containers
+    - Requirements files
+    - Migration checks
+    - Static file handling
+    - Proper logging setup
+  prohibited:
+    - Hardcoded environment settings
+    - Direct production database access
+    - Manual deployment steps 
