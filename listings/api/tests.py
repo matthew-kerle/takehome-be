@@ -61,14 +61,41 @@ class ListingAPITests(TestCase):
             zipcode="94612"
         )
 
+        # Add a third listing with different price points
+        self.listing3 = Listing.objects.create(
+            zillow_id="11111",
+            area_unit="SqFt",
+            bathrooms=3.0,
+            bedrooms=4,
+            home_size=2500,
+            home_type="Single Family",
+            last_sold_date="2022-01-15",
+            last_sold_price=350000000,  # $3.5M
+            link="https://www.zillow.com/homedetails/789",
+            price=400000000,  # $4M
+            property_size=6000,
+            rent_price=500000,  # $5K
+            rentzestimate_amount=485000,  # $4,850
+            rentzestimate_last_updated="2024-01-01",
+            tax_value=12586000,  # $125,860
+            tax_year=2023,
+            year_built=2000,
+            zestimate_amount=420390600,  # $4,203,906
+            zestimate_last_updated="2024-01-01",
+            address="789 Pine St",
+            city="San Francisco",
+            state="CA",
+            zipcode="94105"
+        )
+
     def test_get_all_listings(self):
         """Test retrieving all listings"""
         url = reverse('listing-list')
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data['results']), 2)
-        self.assertEqual(response.data['count'], 2)
+        self.assertEqual(len(response.data['results']), 3)
+        self.assertEqual(response.data['count'], 3)
 
     def test_get_single_listing(self):
         """Test retrieving a single listing"""
