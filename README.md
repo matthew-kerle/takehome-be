@@ -53,6 +53,8 @@ As such, if you do end up referencing someone else's work and building upon it, 
 Provide a link to the source so we can see the original work and any modifications that you chose to make. 
 
 ## Setup Instructions
+
+### Option 1: Local Setup
 1. Fork this repository and clone to your local environment. If you make your fork private, please give access to the `bungalow-engineering` user. 
 1. Install a version of Python 3 if you do not already have one. We recommend Python 3.8 or newer.
 1. You can use the built-in virtual environment creation within Python to create a sandboxed set of package installs. 
@@ -66,6 +68,50 @@ Provide a link to the source so we can see the original work and any modificatio
 1. To run the data import command run `python manage.py import_house_data`
 1. You are now setup and ready to start coding. 
 
+### Option 2: Docker Setup
+The project includes Docker configuration for easy setup and consistent development environment.
+
+#### Prerequisites
+- Docker and Docker Compose installed on your system
+- Git for cloning the repository
+
+#### Setup Steps
+1. Fork and clone the repository
+2. Build and start the containers:
+   ```bash
+   docker-compose up -d --build
+   ```
+3. Apply database migrations:
+   ```bash
+   docker-compose exec web python listings/manage.py migrate
+   ```
+
+#### Docker Commands
+- Start containers: `docker-compose up -d`
+- Stop containers: `docker-compose down`
+- View logs: `docker-compose logs -f`
+- Execute commands in container: `docker-compose exec web <command>`
+- Rebuild containers: `docker-compose up -d --build`
+
+### Database Setup
+The project uses PostgreSQL as the database. You can connect to it using:
+
+#### Connection Details
+- Host: localhost
+- Port: 5433
+- Database: listings
+- Username: postgres
+- Password: postgres
+
+#### Connection URI
+```
+postgresql://postgres:postgres@localhost:5433/listings
+```
+
+#### Database Management
+- The database data is persisted in a Docker volume
+- Migrations are automatically applied when starting the container
+- You can manually run migrations with: `docker-compose exec web python listings/manage.py migrate`
 
 # Your Notes
 *TODO: Add your documentation here* 
