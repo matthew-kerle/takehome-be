@@ -267,7 +267,7 @@ export const HomePage: React.FC = () => {
           <>
             <Stack direction="row" spacing={3} flexWrap="wrap" useFlexGap px={1}>
               {listings.map((listing, idx) => (
-                <Box key={listing.id} sx={{ flex: '1 1 320px', maxWidth: 340, marginBottom: 24 }}>
+                <Box key={listing.id} sx={{ flex: '1 1 320px', maxWidth: 340, mb: 2 }}>
                   <ListingCard
                     image={STOCK_IMAGES[idx % STOCK_IMAGES.length]}
                     price={listing.price}
