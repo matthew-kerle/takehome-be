@@ -94,21 +94,29 @@ export const ListingCard: React.FC<ListingCardProps> = ({
         <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 0.5 }}>
           <Stack direction="row" spacing={0.5} alignItems="center">
             <HotelIcon sx={{ fontSize: 18, color: 'primary.main' }} />
-            <Typography variant="body2">{beds} Beds</Typography>
+            <Typography variant="body2">
+              {beds !== null ? beds : '—'} Beds
+            </Typography>
           </Stack>
           <Stack direction="row" spacing={0.5} alignItems="center">
             <BathtubIcon sx={{ fontSize: 18, color: 'primary.main' }} />
-            <Typography variant="body2">{baths} Bath{baths !== 1 ? 's' : ''}</Typography>
+            <Typography variant="body2">
+              {baths !== null ? baths : '—'} Bath{baths !== 1 ? 's' : ''}
+            </Typography>
           </Stack>
         </Stack>
         <Stack direction="row" spacing={2} alignItems="center">
           <Stack direction="row" spacing={0.5} alignItems="center">
             <SquareFootIcon sx={{ fontSize: 18, color: 'primary.main' }} />
-            <Typography variant="body2">{sqft.toLocaleString()} sqft</Typography>
+            <Typography variant="body2">
+              {sqft !== null ? `${sqft.toLocaleString()} sqft` : '— sqft'}
+            </Typography>
           </Stack>
           <Stack direction="row" spacing={0.5} alignItems="center">
             <CalendarMonthIcon sx={{ fontSize: 18, color: 'primary.main' }} />
-            <Typography variant="body2">Built {year}</Typography>
+            <Typography variant="body2">
+              Built {year !== null ? year : '—'}
+            </Typography>
           </Stack>
         </Stack>
         <MuiLink

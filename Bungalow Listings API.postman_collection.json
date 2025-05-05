@@ -273,6 +273,50 @@
 					}
 				},
 				{
+					"name": "Filter by Bedrooms (Comma-Separated List)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/listings/?bedrooms=2,3",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "listings", ""],
+							"query": [
+								{
+									"key": "bedrooms",
+									"value": "2,3",
+									"description": "Comma-separated list of bedroom counts (e.g., 2,3)"
+								}
+							]
+						},
+						"description": "Filter listings with 2 or 3 bedrooms using a comma-separated list. This feature allows you to match any of the specified bedroom counts."
+					}
+				},
+				{
+					"name": "Filter by Bathrooms (Comma-Separated List)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/listings/?bathrooms=1,2.5",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "listings", ""],
+							"query": [
+								{
+									"key": "bathrooms",
+									"value": "1,2.5",
+									"description": "Comma-separated list of bathroom counts (e.g., 1,2.5)"
+								}
+							]
+						},
+						"description": "Filter listings with 1 or 2.5 bathrooms using a comma-separated list. This feature allows you to match any of the specified bathroom counts, including decimals."
+					}
+				},
+				{
 					"name": "Filter by Property Size Range",
 					"request": {
 						"method": "GET",

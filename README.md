@@ -138,6 +138,9 @@ docker-compose exec web python listings/manage.py import_listing_data --reset
 
 ### Improvements
 
+#### Backend
+- Caching mechanism for listings based on product requirements.
+
 #### Frontend
 - Add environment variables so it's actually production ready.
 - Handle pre-fetching, loading states, caching, and error states better

@@ -83,6 +83,9 @@ class ListingFilter(FilterSet, RangeFilterMixin, PriceRangeFilterMixin):
     state = django_filters.CharFilter(lookup_expr="iexact")
     zipcode = django_filters.CharFilter(lookup_expr="icontains")
 
+    bedrooms = django_filters.CharFilter(method="filter_bedrooms")
+    bathrooms = django_filters.CharFilter(method="filter_bathrooms")
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -138,6 +141,28 @@ class ListingFilter(FilterSet, RangeFilterMixin, PriceRangeFilterMixin):
 
     def filter_zestimate_amount_max(self, queryset, name, value):
         return self.filter_price_range(queryset, "zestimate_amount", max_value=value)
+
+    def filter_bedrooms(self, queryset, name: str, value: str):
+        """Filter by a single value or a comma-separated list of bedroom counts."""
+        if not value:
+            return queryset
+        values = [v.strip() for v in value.split(",") if v.strip()]
+        try:
+            int_values = [int(v) for v in values]
+        except ValueError:
+            return queryset.none()
+        return queryset.filter(bedrooms__in=int_values)
+
+    def filter_bathrooms(self, queryset, name: str, value: str):
+        """Filter by a single value or a comma-separated list of bathroom counts."""
+        if not value:
+            return queryset
+        values = [v.strip() for v in value.split(",") if v.strip()]
+        try:
+            float_values = [float(v) for v in values]
+        except ValueError:
+            return queryset.none()
+        return queryset.filter(bathrooms__in=float_values)
 
     class Meta:
         model = Listing

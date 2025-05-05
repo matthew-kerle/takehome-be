@@ -11,8 +11,11 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { ListingCard } from './components/ListingCard';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
 import TuneIcon from '@mui/icons-material/Tune';
-import { AnimatePresence, motion } from 'framer-motion';
 
 interface ApiListing {
   id: number;
@@ -58,44 +61,60 @@ const getFriendlyType = (type: string) => {
   return type.replace(/([a-z])([A-Z])/g, '$1 $2');
 };
 
+// Filter state type
+interface ListingFilters {
+  search: string;
+  ordering: string;
+}
+
 export const HomePage: React.FC = () => {
   const [listings, setListings] = useState<ApiListing[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [page, setPage] = useState<number>(1);
-  const [hasMore, setHasMore] = useState<boolean>(true);
-  const [loadingMore, setLoadingMore] = useState<boolean>(false);
 
-  const fetchListings = (pageNum: number, append = false) => {
-    if (append) setLoadingMore(true);
-    else setLoading(true);
-    fetch(`/api/listings/?page_size=8&page=${pageNum}`)
+  // Centralized filter state
+  const [filters, setFilters] = useState<ListingFilters>({
+    search: '',
+    ordering: '',
+  });
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  // Build query string from filters
+  const buildQuery = () => {
+    const params = new URLSearchParams();
+    if (filters.search) params.append('search', filters.search);
+    if (filters.ordering) params.append('ordering', filters.ordering);
+    params.append('page_size', '8');
+    params.append('page', String(page));
+    return params.toString();
+  };
+
+  // Fetch listings when filters/search/sort change
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/api/listings/?${buildQuery()}`)
       .then((res) => res.json())
       .then((data) => {
-        if (append) {
-          setListings((prev) => [...prev, ...(data.results || [])]);
-        } else {
-          setListings(data.results || []);
-        }
-        setHasMore(Boolean(data.next));
+        setListings(data.results || []);
         setLoading(false);
-        setLoadingMore(false);
       })
       .catch(() => {
         setLoading(false);
-        setLoadingMore(false);
       });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters, page]);
 
-  useEffect(() => {
-    fetchListings(1, false);
+  // Handlers
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilters((prev) => ({ ...prev, search: e.target.value }));
     setPage(1);
-  }, []);
-
-  const handleViewMore = () => {
-    const nextPage = page + 1;
-    setPage(nextPage);
-    fetchListings(nextPage, true);
   };
+  const handleOrderingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilters((prev) => ({ ...prev, ordering: e.target.value }));
+    setPage(1);
+  };
+  const handleOpenFilters = () => setFiltersOpen(true);
+  const handleCloseFilters = () => setFiltersOpen(false);
 
   return (
     <Box sx={{ maxWidth: 900, mx: 'auto', pt: 8, pb: 6 }}>
@@ -155,6 +174,8 @@ export const HomePage: React.FC = () => {
           <TextField
             variant="outlined"
             placeholder="Search by address, city, or zip code"
+            value={filters.search}
+            onChange={handleSearchChange}
             sx={{
               flex: 2,
               minWidth: 260,
@@ -185,7 +206,8 @@ export const HomePage: React.FC = () => {
           <TextField
             select
             variant="outlined"
-            defaultValue="price-asc"
+            value={filters.ordering}
+            onChange={handleOrderingChange}
             sx={{
               flex: 1,
               minWidth: 200,
@@ -198,32 +220,29 @@ export const HomePage: React.FC = () => {
                 color: '#222b45',
                 background: '#fff',
                 height: 56,
-                pl: 1.5,
               },
             }}
           >
-            <MenuItem value="price-asc">Price (Low to High)</MenuItem>
-            <MenuItem value="price-desc">Price (High to Low)</MenuItem>
-            <MenuItem value="date-desc">Newest</MenuItem>
-            <MenuItem value="date-asc">Oldest</MenuItem>
+            <MenuItem value="">Sort By</MenuItem>
+            <MenuItem value="price">Price (Low to High)</MenuItem>
+            <MenuItem value="-price">Price (High to Low)</MenuItem>
+            <MenuItem value="-year_built">Year Built (Newest)</MenuItem>
+            <MenuItem value="year_built">Year Built (Oldest)</MenuItem>
           </TextField>
           <Button
-            variant="contained"
-            startIcon={<TuneIcon sx={{ color: '#fff', fontSize: 26 }} />}
+            variant="outlined"
+            startIcon={<TuneIcon />}
+            onClick={handleOpenFilters}
             sx={{
-              minWidth: 180,
               height: 56,
+              fontSize: 18,
+              fontWeight: 600,
               borderRadius: 2,
-              background: 'linear-gradient(90deg, #ff914d 0%, #e94e77 100%)',
-              color: '#fff',
-              fontWeight: 700,
-              fontSize: 20,
-              boxShadow: 'none',
-              px: 4,
-              '&:hover': {
-                background: 'linear-gradient(90deg, #ff914d 0%, #e94e77 100%)',
-                opacity: 0.92,
-              },
+              px: 3,
+              bgcolor: '#fff',
+              borderColor: '#e0e0e0',
+              color: '#222b45',
+              '&:hover': { bgcolor: '#f7f8fa' },
             }}
           >
             Filters
@@ -247,60 +266,37 @@ export const HomePage: React.FC = () => {
         ) : (
           <>
             <Stack direction="row" spacing={3} flexWrap="wrap" useFlexGap px={1}>
-              <AnimatePresence initial={false}>
-                {listings.map((listing, idx) => (
-                  <motion.div
-                    key={listing.id}
-                    initial={{ opacity: 0, y: 24 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 24 }}
-                    transition={{ duration: 0.4, ease: 'easeOut' }}
-                    style={{ flex: '1 1 320px', maxWidth: 340, marginBottom: 24 }}
-                  >
-                    <ListingCard
-                      image={STOCK_IMAGES[idx % STOCK_IMAGES.length]}
-                      price={listing.price}
-                      address={`${listing.address}, ${listing.city}`}
-                      beds={listing.bedrooms}
-                      baths={listing.bathrooms}
-                      sqft={listing.home_size}
-                      year={listing.year_built}
-                      soldDate={listing.last_sold_date}
-                      zillowUrl={listing.link}
-                      type={getFriendlyType(listing.home_type)}
-                    />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+              {listings.map((listing, idx) => (
+                <Box key={listing.id} sx={{ flex: '1 1 320px', maxWidth: 340, marginBottom: 24 }}>
+                  <ListingCard
+                    image={STOCK_IMAGES[idx % STOCK_IMAGES.length]}
+                    price={listing.price}
+                    address={`${listing.address}, ${listing.city}`}
+                    beds={listing.bedrooms}
+                    baths={listing.bathrooms}
+                    sqft={listing.home_size}
+                    year={listing.year_built}
+                    soldDate={listing.last_sold_date}
+                    zillowUrl={listing.link}
+                    type={getFriendlyType(listing.home_type)}
+                  />
+                </Box>
+              ))}
             </Stack>
-            {hasMore && !loading && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                <Button
-                  variant="contained"
-                  onClick={handleViewMore}
-                  disabled={loadingMore}
-                  sx={{
-                    background: 'linear-gradient(90deg, #ff914d 0%, #e94e77 100%)',
-                    color: '#fff',
-                    fontWeight: 700,
-                    fontSize: 18,
-                    borderRadius: 2,
-                    px: 5,
-                    py: 1.5,
-                    boxShadow: 'none',
-                    '&:hover': {
-                      background: 'linear-gradient(90deg, #ff914d 0%, #e94e77 100%)',
-                      opacity: 0.92,
-                    },
-                  }}
-                >
-                  {loadingMore ? 'Loading...' : 'View More'}
-                </Button>
-              </Box>
-            )}
           </>
         )}
       </Box>
+      <Dialog open={filtersOpen} onClose={handleCloseFilters} maxWidth="md" fullWidth>
+        <DialogTitle>Filters</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary">
+            Filter controls coming soon...
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseFilters}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
