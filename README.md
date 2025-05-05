@@ -1,7 +1,8 @@
 # Bungalow Take Home Project for Backend Developer Role
 
 ## To Do
-- [ ] Add a frontend just to interface with the API's for a better experience
+- [ ] Fix "Load More" in frontend
+- [ ] Finish filtering
 
 ## About This Project
 This is a Django based assignment. We have created a base project for you to work from. 
